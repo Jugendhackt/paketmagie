@@ -1,0 +1,11 @@
+[
+  {
+    "PackageID": 0,
+    "Start": 0,
+    "End": 0,
+    "MaxTime": 0,
+    "Travelling": false,
+    "RouteID": 0,
+    "Volume": [0, 0, 0]
+  }
+]
