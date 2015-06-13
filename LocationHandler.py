@@ -16,7 +16,7 @@ Paths = []
 
 
 
-class User:
+class User(object):
     def __init__(self):
         global userIDMax
         self.UserID = userIDMax
@@ -24,7 +24,7 @@ class User:
         self.pathIDs = {}
 
 
-class ExPoint:
+class ExPoint(object):
     def __init__(self):
         global exPointMax
         self.exID = exPointMax
@@ -32,7 +32,7 @@ class ExPoint:
         self.PackageID = []
 
 
-class Package:
+class Package(object):
     def __init__(self):
         global PackageMax
         self.PackageID = PackageMax
@@ -44,7 +44,7 @@ class Package:
         self.RouteID = 0
 
 
-class Route:
+class Route(object):
     def __init__(self):
         global RouteMax
         self.RouteID = RouteMax
@@ -53,7 +53,7 @@ class Route:
         self.UserIDs = []
 
 
-class Path:
+class Path(object):
     def __init__(self):
         global PathMax
         self.PathID = PathMax
@@ -99,7 +99,7 @@ def ParsePath(Infos):
         path.EndTime = parsed[i]['EndTime']
         path.exPoints = parsed[i]['exchangePoints']
         Paths.append(path)
-    print "raed Path"
+    print "read Path"
 
 
 def ParsePackage(Infos):
@@ -187,3 +187,92 @@ def getPath(id):
         if path.PathID == id:
             return path
     return None
+
+
+def addExPoint(point):
+    global ExPoints
+    if type(point) == ExPoint:
+        ExPoints.append(point)
+        point_dict = {
+            "ExchangeID": point.exID,
+            "Location": [0, 0],
+            "Volume": [0, 0, 0],
+            "PackageID": point.PackageID
+        }
+        with open("exchangePoints.json", "r+") as f:
+            f.seek(-2, 2)
+            f.write(',\n')
+            print json.dump( point_dict, f, indent=2)
+            f.write('\n]')
+
+
+def addPackage(pack):
+    global Packages
+    if type(pack) == Package:
+        Packages.append(pack)
+        pack_dict = {
+            "PackageID": pack.PackageID,
+            "Start": pack.Start,
+            "End": pack.End,
+            "MaxTime": pack.MaxTime,
+            "Travelling": pack.Travelling,
+            "RouteID": pack.RouteID
+        }
+        with open("Package.json", "r+") as f:
+            f.seek(-2, 2)
+            f.write(',\n')
+            print json.dump( pack_dict, f, indent=2)
+            f.write('\n]')
+
+
+def addPath(path):
+    global Path
+    if type(path) == Path:
+        Paths.append(path)
+        point_dict = {
+            "PathID": path.PathID,
+            "StartPoint": path.StartPoint,
+            "EndPoint": path.EndPoint,
+            "StartTime": path.StartTime,
+            "EndTime": path.EndTime,
+            "exchangePoints": path.exPoints
+        }
+        with open("exchangePoints.json", "r+") as f:
+            f.seek(-2, 2)
+            f.write(',\n')
+            print json.dump( point_dict, f, indent=2)
+            f.write('\n]')
+
+
+def addRoute(route):
+    global Routes
+    if type(route) == Route:
+        Routes.append(route)
+        point_dict = {
+            "RouteID": route.RouteID,
+            "ExchangeIDs": route.exPID,
+            "UserIDs": route.UserIDs
+        }
+        with open("Route.json", "r+") as f:
+            f.seek(-2, 2)
+            f.write(',\n')
+            print json.dump( point_dict, f, indent=2)
+            f.write('\n]')
+
+
+def addUsers(user):
+    global Users
+    if type(user) == User:
+        Users.append(user)
+        point_dict = {
+            "UserID": user.UserID,
+            "PathIDs": user.pathIDs
+        }
+        with open("exchangePoints.json", "r+") as f:
+            f.seek(-2, 2)
+            f.write(',\n')
+            print json.dump( point_dict, f, indent=2)
+            f.write('\n]')
+
+
+print "done"
