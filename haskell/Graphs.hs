@@ -55,7 +55,7 @@ edgesFrom (Graph edgeList) node = filter (\(Edge n _ _) -> n == node) edgeList
 run :: Node -> Node -> Graph -> Tick -> [(Path, Double, Tick)]
 run start end graph maxTicks = go start 1 maxTicks . toTickable $ graph
     where go :: Node -> Double -> Tick -> Tickable -> [(Path, Double, Tick)]
-          go _ _ (-1) _ = []
+          go _ _ x _ | x <= -1 = []
           go current prob ticks _ | current == end = [([current], prob, maxTicks - ticks)]
           go current prob ticks tickable = let nextTicks = ticks - 1
                                                squashed = squash tickable
