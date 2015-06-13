@@ -1,9 +1,10 @@
-{-# LANGUAGE PatternGuards #-}
+-- {-# LANGUAGE PatternGuards #-}
 
 module Graphs where
 
+import           Control.Monad   (unless)
 import qualified Data.Map.Strict as M
-import           Data.Maybe (fromMaybe)
+import           Data.Maybe      (fromMaybe)
 
 type Tick = Integer
 
@@ -37,7 +38,7 @@ tick = fmap safeTail
 
 toTickable :: Graph -> Tickable
 toTickable (Graph edges) = foldr f M.empty edges
-    where f (Edge from to ratings) m = M.insert (from, to) ratings m
+    where f (Edge from to ratings) = M.insert (from, to) ratings
 
 probabilityLookup :: Tick -> M.Map Tick Double -> Double
 probabilityLookup t = fromMaybe 0 . M.lookup t
@@ -63,7 +64,7 @@ run start end graph maxTicks = go start 1 maxTicks . toTickable $ graph
 
           nexts :: Node -> Double -> Tick -> Tickable -> [(Path, Double, Tick)]
           nexts current prob ticks tickable = map (prepend current) . concatMap launch . edgesFrom graph $ current
-            where launch (Edge current next _) = go next (prob * (getProb (current, next) tickable)) ticks (tick tickable)
+            where launch (Edge current next _) = go next (prob * getProb (current, next) tickable) ticks (tick tickable)
 
           prepend :: a -> ([a], b, c) -> ([a], b, c)
           prepend x (xs, y, z) = (x:xs, y, z)
