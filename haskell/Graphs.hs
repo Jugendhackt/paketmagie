@@ -68,3 +68,10 @@ run start end graph maxTicks = go start 1 maxTicks . toTickable $ graph
 
           prepend :: a -> ([a], b, c) -> ([a], b, c)
           prepend x (xs, y, z) = (x:xs, y, z)
+
+pathSummary :: (Path, Double, Tick) -> IO ()
+pathSummary (path, prob, ticks) = do
+  unless (null path) $ return ()
+  putStrLn showString
+  where showString = route ++ " takes " ++ show ticks ++ " ticks and successful transportation will happen with " ++ show prob ++ " probability."
+        route      = if null path then "" else foldl1 (\folded el -> folded ++ " -> " ++ el) path
