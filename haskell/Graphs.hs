@@ -63,7 +63,7 @@ run start end graph maxTicks = go start 1 maxTicks . toTickable $ graph
             in go current prob nextTicks squashed ++ nexts current prob nextTicks tickable
 
           nexts :: Node -> Double -> Tick -> Tickable -> [(Path, Double, Tick)]
-          nexts current prob ticks tickable = map (prepend current) . concatMap launch . edgesFrom graph $ current
+          nexts current prob ticks tickable = filter (\(_, prob, _) -> prob /= 0.0) . map (prepend current) . concatMap launch . edgesFrom graph $ current
             where launch (Edge current next _) = go next (prob * getProb (current, next) tickable) ticks (tick tickable)
 
           prepend :: a -> ([a], b, c) -> ([a], b, c)
