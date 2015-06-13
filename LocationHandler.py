@@ -1,6 +1,18 @@
 # __author__ = 'bz'
 
 
+userIDMax = 0
+exPointMax = 0
+PackageMax = 0
+RouteMax = 0
+PathMax = 0
+Users = {}
+ExPoints = {}
+Packages = {}
+Routes = {}
+Paths = {}
+
+
 with open("Users.json") as f:
     UserInfos = f.read()
 
@@ -16,17 +28,6 @@ with open("Route.json") as f:
 with open("Path.json") as f:
     paths = f.read()
 
-
-userIDMax = 0
-exPointMax = 0
-PackageMax = 0
-RouteMax = 0
-PathMax = 0
-Users = {}
-ExPoints = {}
-Packages = {}
-Routes = {}
-Paths = {}
 
 
 class User:
@@ -75,3 +76,37 @@ class Path:
         self.EndTime = 0
         self.exPoints = []
 
+
+def getUser(id):
+    for user in Users:
+        if user.UserID == id:
+            return user
+    return None
+
+
+def getExPoint(id):
+    for exP in ExPoints:
+        if exP.exID == id:
+            return exP
+    return None
+
+
+def getPackage(id):
+    for pack in Packages:
+        if pack.PackageID == id:
+            return pack
+    return None
+
+
+def getRoute(id):
+    for route in Routes:
+        if route.RouteID == id:
+            return route
+    return None
+
+
+def getPath(id):
+    for path in Paths:
+        if path.PathID == id:
+            return path
+    return None
