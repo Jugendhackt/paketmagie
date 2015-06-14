@@ -45,9 +45,13 @@ probabilityLookup t = fromMaybe 0 . M.lookup t
 
 exampleGraph :: Graph
 exampleGraph = Graph [
-    Edge "Rathausplatz" "Moritzplatz" [0.7, 0.01, 0.5, 0.2]
-  , Edge "Königsplatz" "Dom" [1, 0.1, 0.2, 0.5]
-  , Edge "Moritzplatz" "Königsplatz" [0.2, 0.41, 0.1, 0.03]
+    Edge "Königsplatz"  "Theater"      [0.75, 0.50, 0.12, 0.30]
+  , Edge "Theater"      "Dom"          [0.32, 0.45, 0.85, 0.63]
+  , Edge "Königsplatz"  "Rathausplatz" [0.10, 0.10, 0.10, 0.30]
+  , Edge "Rathausplatz" "Moritzplatz"  [0.70, 0.01, 0.50, 0.20]
+  , Edge "Rathausplatz" "Dom"          [0.25, 0.10, 0.20, 0.50]
+  , Edge "Dom"          "Rathausplatz" [0.30, 0.13, 0.50, 0.60]
+  , Edge "Moritzplatz"  "Königsplatz"  [0.20, 0.41, 0.10, 0.03]
     ]
 
 edgesFrom :: Graph -> Node -> [Edge]
@@ -73,5 +77,8 @@ pathSummary :: (Path, Double, Tick) -> IO ()
 pathSummary (path, prob, ticks) = do
   unless (null path) $ return ()
   putStrLn showString
-  where showString = route ++ " takes " ++ show ticks ++ " ticks and successful transportation will happen with " ++ show prob ++ " probability."
+  where showString = route ++ " Ticks: " ++ show ticks ++ " Propability: " ++ show prob
         route      = if null path then "" else foldl1 (\folded el -> folded ++ " -> " ++ el) path
+
+calcRoute :: Node -> Node -> IO ()
+calcRoute node1 node2 = mapM_ pathSummary $ run node1 node2 exampleGraph 4
