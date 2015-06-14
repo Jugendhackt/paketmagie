@@ -3,11 +3,87 @@
     "ExchangeID": 0,
     "Location": [0, 0],
     "Volume": [0, 0, 0],
-
+    "Name": "...",
+    "Address": "...",
     "TimestampLeave": [],
     "TimestampArrive": [],
     "PackageID": [],
 
     "ClosestIDs": [1, 2, 3, 4, 5]
-  }
+  },
+{
+  "ExchangeID": 1, 
+  "Name": "Augsburg Theater", 
+  "Volume": [
+    0, 
+    0, 
+    0
+  ], 
+  "Location": [
+    48.3689767, 
+    10.8928928
+  ], 
+  "PackageID": [], 
+  "Address": "Theater, Fuggerstra\u00dfe, Bahnhofs- und Bismarckviertel, Innenstadt, Augsburg, Schwaben, Bayern, 86150, Deutschland"
+},
+{
+  "ExchangeID": 2, 
+  "Name": "Augsburg Koenigsplatz", 
+  "Volume": [
+    0, 
+    0, 
+    0
+  ], 
+  "Location": [
+    48.3664681, 
+    10.8947726
+  ], 
+  "PackageID": [], 
+  "Address": "K\u00f6nigsplatz, Innenstadt, St. Ulrich-Dom, Innenstadt, Augsburg, Schwaben, Bayern, 86150, Deutschland"
+},
+{
+  "ExchangeID": 3, 
+  "Name": "Augsburg Dom", 
+  "Volume": [
+    0, 
+    0, 
+    0
+  ], 
+  "Location": [
+    48.3725477, 
+    10.8968356
+  ], 
+  "PackageID": [], 
+  "Address": "Dom, Hoher Weg, Innenstadt, St. Ulrich-Dom, Innenstadt, Augsburg, Schwaben, Bayern, 86152, Deutschland"
+},
+{
+  "ExchangeID": 4, 
+  "Name": "Augsburg Rathausplatz", 
+  "Volume": [
+    0, 
+    0, 
+    0
+  ], 
+  "Location": [
+    48.368851, 
+    10.8977195
+  ], 
+  "PackageID": [], 
+  "Address": "Rathausplatz, Innenstadt, St. Ulrich-Dom, Innenstadt, Augsburg, Schwaben, Bayern, 86150, Deutschland"
+},
+{
+  "ExchangeID": 5, 
+  "Name": "Augsburg Moritzplatz", 
+  "Volume": [
+    0, 
+    0, 
+    0
+  ], 
+  "Location": [
+    48.36685145, 
+    10.8972497406288
+  ], 
+  "PackageID": [], 
+  "Address": "Moritzplatz, Innenstadt, St. Ulrich-Dom, Innenstadt, Augsburg, Schwaben, Bayern, 86150, Deutschland"
+}
 ]

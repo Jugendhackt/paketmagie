@@ -1,5 +1,6 @@
 # __author__ = 'bz'
 import json
+from geopy.geocoders import Nominatim
 
 
 userIDMax = 0
@@ -30,6 +31,9 @@ class ExPoint(object):
         self.exID = exPointMax
         exPointMax += 1
         self.PackageID = []
+        self.Location = [0, 0]
+        self.address = ""
+        self.Name = ""
 
 
 class Package(object):
@@ -37,7 +41,7 @@ class Package(object):
         global PackageMax
         self.PackageID = PackageMax
         PackageMax += 1
-        self.Start = 0
+        self.Start = 011
         self.End = 0
         self.MaxTime = 0
         self.Travelling = False
@@ -122,6 +126,9 @@ def ParsePoints(Infos):
         points = ExPoint()
         points.exID = parsed[i]['ExchangeID']
         points.PackageID = parsed[i]['PackageID']
+        points.Location = parsed[i]['Location']
+        points.address = parsed[i]['Address']
+        points.Name = parsed[i]['Name']
         ExPoints.append(points)
     print "read Route"
 
@@ -195,7 +202,9 @@ def addExPoint(point):
         ExPoints.append(point)
         point_dict = {
             "ExchangeID": point.exID,
-            "Location": [0, 0],
+            "Location": point.Location,
+            "Name": point.Name,
+            "Address": point.address,
             "Volume": [0, 0, 0],
             "PackageID": point.PackageID
         }
@@ -275,4 +284,18 @@ def addUsers(user):
             f.write('\n]')
 
 
-print "done"
+# print "done, starting geopy"
+
+# name = "Augsburg Moritzplatz"
+#
+# geolocator = Nominatim()
+# location = geolocator.geocode(name)
+# print location.address
+#
+# point = ExPoint()
+# point.Location = [location.latitude, location.longitude]
+# point.Name = name
+# point.address = location.address
+# addExPoint(point)
+#
+# print "added ExPoint"
