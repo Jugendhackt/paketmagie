@@ -1,11 +1,25 @@
-with (import <nixpkgs> {}).pkgs;
+{ nixpkgs ? import <nixpkgs> {}, compiler ? "ghc7101" }:
+
 let
-    ghc = haskellPackages.ghcWithPackages (pkgs:
-        with pkgs; []
-    );
+
+  inherit (nixpkgs) pkgs;
+
+  f = { mkDerivation, aeson, base, bytestring, containers, stdenv
+      , vector
+      }:
+      mkDerivation {
+        pname = "PaketmagieRouting";
+        version = "0.1.0.0";
+        src = ./.;
+        isLibrary = false;
+        isExecutable = true;
+        buildDepends = [ aeson base bytestring containers vector ];
+        description = "Routing Packages magically";
+        license = stdenv.lib.licenses.unfree;
+      };
+
+  drv = pkgs.haskell.packages.${compiler}.callPackage f {};
+
 in
-    stdenv.mkDerivation {
-        name = "kademlia-env";
-        buildInputs = [ ghc haskellPackages.cabalInstall ];
-        shellHook = "eval $(grep export ${ghc}/bin/ghc)";
-    }
+
+  if pkgs.lib.inNixShell then drv.env else drv
