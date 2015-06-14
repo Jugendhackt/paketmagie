@@ -77,12 +77,12 @@ exampleGraph = TickingGraph [
 edgesFrom :: TickingGraph -> Node -> [Edge]
 edgesFrom (TickingGraph edgeList _) node = filter (\(Edge n _ _) -> n == node) edgeList
 
--- | run runs the unwieldy algorithm
+-- | runAlgorithm runs the unwieldy algorithm
 -- It calculates all possible routes between node within a certain duraition,
 -- and returns them, along with their total probability and their duraition
 -- in ticks
-run :: Node -> Node -> TickingGraph -> Tick -> [(Path, Float, Tick)]
-run start end graph maxTicks = go start 1 maxTicks $ graph
+runAlgorithm :: Node -> Node -> TickingGraph -> Tick -> [(Path, Float, Tick)]
+runAlgorithm start end graph maxTicks = go start 1 maxTicks $ graph
     where go :: Node -> Float -> Tick -> TickingGraph -> [(Path, Float, Tick)]
           go _ _ x _ | x <= -1 = []
           go current prob ticks graph | current == end = [([(current, waitDuration graph)], prob, maxTicks - ticks)]

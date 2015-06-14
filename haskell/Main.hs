@@ -45,7 +45,7 @@ main = do
         endNode   = args !! 1
         maxTicks  :: Tick
         maxTicks  = read $ args !! 2
-        paths     = sortBy (\(_, p1, _) (_, p2, _) -> compare p2 p1) $ run startNode endNode (fromJust graph) maxTicks
+        paths     = sortBy (\(_, p1, _) (_, p2, _) -> compare p2 p1) $ runAlgorithm startNode endNode (fromJust graph) maxTicks
         bestPath  = head paths
 --    pathSummary bestPath
 --    mapM_ pathSummary paths
