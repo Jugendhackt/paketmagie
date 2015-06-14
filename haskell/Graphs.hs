@@ -1,17 +1,19 @@
 -- {-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Graphs where
 
 import           Control.Monad   (unless)
 import qualified Data.Map.Strict as M
 import           Data.Maybe      (fromMaybe)
+import           Data.Aeson      (FromJSON, ToJSON)
 
 type Tick = Integer
 
 type Id = String
 type Node = Id
 
-data Edge = Edge Node Node [Double]
+data Edge = Edge Node Node [Float]
     deriving (Show)
 
 data Graph = Graph [Edge]
@@ -19,14 +21,14 @@ data Graph = Graph [Edge]
 
 type Path = [Node]
 
-type Tickable = M.Map (Node, Node) [Double]
+type Tickable = M.Map (Node, Node) [Float]
 
 squash :: Tickable -> Tickable
 squash = fmap f
     where f (a:b:xs) = a + b : xs
           f rest = rest
 
-getProb :: (Node, Node) -> Tickable -> Double
+getProb :: (Node, Node) -> Tickable -> Float
 getProb a b = fromMaybe 0 . safeHead . M.lookup a $ b
     where safeHead (Just []) = Nothing
           safeHead xs        = fmap head xs
@@ -40,7 +42,7 @@ toTickable :: Graph -> Tickable
 toTickable (Graph edges) = foldr f M.empty edges
     where f (Edge from to ratings) = M.insert (from, to) ratings
 
-probabilityLookup :: Tick -> M.Map Tick Double -> Double
+probabilityLookup :: Tick -> M.Map Tick Float -> Float
 probabilityLookup t = fromMaybe 0 . M.lookup t
 
 exampleGraph :: Graph
@@ -57,23 +59,23 @@ exampleGraph = Graph [
 edgesFrom :: Graph -> Node -> [Edge]
 edgesFrom (Graph edgeList) node = filter (\(Edge n _ _) -> n == node) edgeList
 
-run :: Node -> Node -> Graph -> Tick -> [(Path, Double, Tick)]
+run :: Node -> Node -> Graph -> Tick -> [(Path, Float, Tick)]
 run start end graph maxTicks = go start 1 maxTicks . toTickable $ graph
-    where go :: Node -> Double -> Tick -> Tickable -> [(Path, Double, Tick)]
+    where go :: Node -> Float -> Tick -> Tickable -> [(Path, Float, Tick)]
           go _ _ x _ | x <= -1 = []
           go current prob ticks _ | current == end = [([current], prob, maxTicks - ticks)]
           go current prob ticks tickable = let nextTicks = ticks - 1
                                                squashed = squash tickable
             in go current prob nextTicks squashed ++ nexts current prob nextTicks tickable
 
-          nexts :: Node -> Double -> Tick -> Tickable -> [(Path, Double, Tick)]
+          nexts :: Node -> Float -> Tick -> Tickable -> [(Path, Float, Tick)]
           nexts current prob ticks tickable = filter (\(_, prob, _) -> prob /= 0.0) . map (prepend current) . concatMap launch . edgesFrom graph $ current
             where launch (Edge current next _) = go next (prob * getProb (current, next) tickable) ticks (tick tickable)
 
           prepend :: a -> ([a], b, c) -> ([a], b, c)
           prepend x (xs, y, z) = (x:xs, y, z)
 
-pathSummary :: (Path, Double, Tick) -> IO ()
+pathSummary :: (Path, Float, Tick) -> IO ()
 pathSummary (path, prob, ticks) = do
   unless (null path) $ return ()
   putStrLn showString
