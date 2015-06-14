@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 import           Control.Applicative  ((<$>), (<*>))
+import           Data.List            (sortBy)
 import           Control.Monad        (mzero, when)
 import           Data.Aeson
-import           Data.ByteString.Lazy as B (readFile, getContents)
+import           Data.ByteString.Lazy as B (readFile, getContents, putStr)
 import           Data.Vector          (Vector, (!))
 import           Graphs
 import           System.Environment   (getArgs)
@@ -44,4 +45,8 @@ main = do
         endNode   = args !! 1
         maxTicks  :: Tick
         maxTicks  = read $ args !! 2
-    calcRoute startNode endNode (fromJust graph) maxTicks
+        paths     = sortBy (\(_, p1, _) (_, p2, _) -> compare p2 p1) $ run startNode endNode (fromJust graph) maxTicks
+        bestPath  = head paths
+--    pathSummary bestPath
+--    mapM_ pathSummary paths
+    B.putStr $ encode bestPath
