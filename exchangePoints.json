@@ -85,5 +85,20 @@
   ], 
   "PackageID": [], 
   "Address": "Moritzplatz, Innenstadt, St. Ulrich-Dom, Innenstadt, Augsburg, Schwaben, Bayern, 86150, Deutschland"
+},
+{
+  "ExchangeID": 6, 
+  "Name": "Augsburg Openlab", 
+  "Volume": [
+    0, 
+    0, 
+    0
+  ], 
+  "Location": [
+    48.3577357, 
+    10.8867806
+  ], 
+  "PackageID": [], 
+  "Address": "OpenLab, 1, Elisenstra\u00dfe, Antonsviertel, Universit\u00e4tsviertel, Augsburg, Schwaben, Bayern, 86159, Deutschland"
 }
 ]
