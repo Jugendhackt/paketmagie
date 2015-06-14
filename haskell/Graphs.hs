@@ -1,3 +1,5 @@
+-- {-# LANGUAGE PatternGuards #-}
+
 module Graphs where
 
 import           Control.Monad   (unless)
