@@ -18,6 +18,9 @@ Routes = []
 Paths = []
 
 
+"""
+Defining all the objects needed later for saving infos
+"""
 
 
 class User(object):
@@ -71,6 +74,10 @@ class Path(object):
         self.EndTime = 0
         self.exPoints = []
 
+
+"""
+Defining all the methods parsing
+"""
 
 
 def ParseUsers(Infos):
@@ -136,6 +143,9 @@ def ParsePoints(Infos):
     # print "read Route"
 
 
+"""
+opening the files and Parsing the found json objects
+"""
 
 with open("Users.json") as f:
     UserInfos = f.read()
@@ -158,6 +168,9 @@ with open("Path.json") as f:
     ParsePath(paths)
 
 
+"""
+API for accessing the JSON data
+"""
 
 def getUser(id):
     global Users
@@ -198,6 +211,9 @@ def getPath(id):
             return path
     return None
 
+"""
+API for adding data to the JSON files
+"""
 
 def addExPoint(point):
     global ExPoints
@@ -286,6 +302,10 @@ def addUsers(user):
             # print json.dump( point_dict, f, indent=2)
             f.write('\n]')
 
+"""
+input: a number n
+returns: all the routes possible with @param n number probabilities for connections to each other
+"""
 
 def getStatistics(n):
     stats = []
