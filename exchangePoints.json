@@ -1,16 +1,4 @@
 [
-  {
-    "ExchangeID": 0,
-    "Location": [0, 0],
-    "Volume": [0, 0, 0],
-    "Name": "...",
-    "Address": "...",
-    "TimestampLeave": [],
-    "TimestampArrive": [],
-    "PackageID": [],
-
-    "ClosestIDs": [1, 2, 3, 4, 5]
-  },
 {
   "ExchangeID": 1, 
   "Name": "Augsburg Theater", 

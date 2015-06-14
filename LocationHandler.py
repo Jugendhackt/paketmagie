@@ -1,7 +1,9 @@
 # __author__ = 'bz'
 import json
 from geopy.geocoders import Nominatim
+import random
 
+random.seed()
 
 userIDMax = 0
 exPointMax = 0
@@ -283,6 +285,26 @@ def addUsers(user):
             print json.dump( point_dict, f, indent=2)
             f.write('\n]')
 
+
+def getStatistics(n):
+    stats = []
+    for i in range(n):
+        stats.append(random.uniform(0.2, 1.0) )
+    return stats
+
+
+def getJsonData(n):
+    data = {
+        "edges": []
+    }
+    for i in range(1, len(ExPoints.__sizeof__() ) ):
+        point = getExPoint(i)
+        for l in range(1, len(ExPoints.__sizeof__() ) ):
+            point2 = getExPoint(l)
+            jsonfoo = { "to": point.Name, "from": point2.Name,
+                        "propabilities": getStatistics(n) }
+            data['edges'].append(jsonfoo)
+    return data
 
 # print "done, starting geopy"
 
