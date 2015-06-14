@@ -1,8 +1,7 @@
 module Graphs where
 
-import           Control.Monad   (unless)
-import qualified Data.Map.Strict as M
-import           Data.Maybe      (fromMaybe)
+import Control.Monad   (unless, join)
+import Data.Maybe      (fromMaybe)
 
 -- | A unit of time, probably 15 minutes
 type Tick = Integer
@@ -16,10 +15,44 @@ type Node = String
 data Edge = Edge Node Node [Float]
     deriving (Show)
 
--- | A graph is just a list of edges, as nodes don't have any data associated
--- with them other than their identity
-data Graph = Graph [Edge]
+-- | A ticking graph is a graph whichs edges a changing weights, in this
+-- case probabilities. For convenience, it also stores the amount of ticks a
+-- packet has waited at a specific waypoint.
+data TickingGraph = TickingGraph [Edge] Tick
   deriving (Show)
+
+-- | Squashing means waiting at a waypoint, hence the probabilities will be
+-- added up and the waiting counter is increased.
+squash :: TickingGraph -> TickingGraph
+squash (TickingGraph edges waited) = TickingGraph (map g edges) (waited + 1)
+    where f (a:b:xs) = a + b : xs
+          f rest = rest
+          g (Edge from to probs) = Edge from to . f $ probs
+
+-- | getProb retrieves the current probability associated with a connection
+-- between two nodes
+getProb :: (Node, Node) -> TickingGraph -> Float
+getProb (from, to) (TickingGraph edges _) = fromMaybe 0 . join . fmap probs . safeHead . filter qualifies $ edges
+    where safeHead [] = Nothing
+          safeHead xs = Just . head $ xs
+
+          qualifies (Edge t f _) | f == from && t == to = True
+          qualifies _ = False
+
+          probs (Edge _ _ ps) = safeHead ps
+
+-- | tick means a tick passed. It updates the ticking graph to represent that
+-- change.
+tick :: TickingGraph -> TickingGraph
+tick (TickingGraph edges _) = TickingGraph ticked 0
+    where ticked = map (\(Edge f t probs) -> Edge f t . safeTail $ probs) edges
+          safeTail [] = []
+          safeTail xs = tail xs
+
+-- | waitDuration retrieves the duration a packet has waited at the current
+-- waypoint.
+waitDuration :: TickingGraph -> Tick
+waitDuration (TickingGraph _ t) = t
 
 -- | A path is a list of tuples of nodes and ticks. The nodes represent the
 -- waypoints a packet is dropped of and picked up at. The ticks are the
@@ -27,43 +60,9 @@ data Graph = Graph [Edge]
 -- picked up.
 type Path = [(Node, Tick)]
 
--- | A tickable is a structure that represents the changing probabilities over
--- time
-type Tickable = (M.Map (Node, Node) [Float], Tick)
-
--- | Squashing means waiting at a waypoint, hence the probabilities will be
--- added up and the waiting counter is increased.
-squash :: Tickable -> Tickable
-squash (m, t) = (fmap f m, t + 1)
-    where f (a:b:xs) = a + b : xs
-          f rest = rest
-
--- | getProb retrieves the current probability associated with a connection
--- between two nodes
-getProb :: (Node, Node) -> Tickable -> Float
-getProb a = fromMaybe 0 . safeHead . M.lookup a . fst
-    where safeHead (Just []) = Nothing
-          safeHead xs        = fmap head xs
-
--- | tick means a tick passed. It updates the tickable to represent that change.
-tick :: Tickable -> Tickable
-tick (m, _) = (fmap safeTail m, 0)
-    where safeTail [] = []
-          safeTail xs = tail xs
-
--- | waitDuration retrieves the duration a packet has waited at the current
--- waypoint.
-waitDuration :: Tickable -> Tick
-waitDuration = snd
-
--- | toTickable converts a graph into a tickable
-toTickable :: Graph -> Tickable
-toTickable (Graph edges) = (foldr f M.empty edges, 0)
-    where f (Edge from to ratings) = M.insert (from, to) ratings
-
 -- | exampleGraph is our test data structure for fiddling around in ghci
-exampleGraph :: Graph
-exampleGraph = Graph [
+exampleGraph :: TickingGraph
+exampleGraph = TickingGraph [
     Edge "Königsplatz"  "Theater"      [0.75, 0.50, 0.12, 0.30]
   , Edge "Theater"      "Dom"          [0.32, 0.45, 0.85, 0.63]
   , Edge "Königsplatz"  "Rathausplatz" [0.10, 0.10, 0.10, 0.30]
@@ -71,29 +70,29 @@ exampleGraph = Graph [
   , Edge "Rathausplatz" "Dom"          [0.25, 0.10, 0.20, 0.50]
   , Edge "Dom"          "Rathausplatz" [0.30, 0.13, 0.50, 0.60]
   , Edge "Moritzplatz"  "Königsplatz"  [0.20, 0.41, 0.10, 0.03]
-    ]
+    ] 0
 
 -- | edgesFrom returns all the edges in a graph that point away from a specified
 -- node
-edgesFrom :: Graph -> Node -> [Edge]
-edgesFrom (Graph edgeList) node = filter (\(Edge n _ _) -> n == node) edgeList
+edgesFrom :: TickingGraph -> Node -> [Edge]
+edgesFrom (TickingGraph edgeList _) node = filter (\(Edge n _ _) -> n == node) edgeList
 
 -- | run runs the unwieldy algorithm
 -- It calculates all possible routes between node within a certain duraition,
 -- and returns them, along with their total probability and their duraition
 -- in ticks
-run :: Node -> Node -> Graph -> Tick -> [(Path, Float, Tick)]
-run start end graph maxTicks = go start 1 maxTicks . toTickable $ graph
-    where go :: Node -> Float -> Tick -> Tickable -> [(Path, Float, Tick)]
+run :: Node -> Node -> TickingGraph -> Tick -> [(Path, Float, Tick)]
+run start end graph maxTicks = go start 1 maxTicks $ graph
+    where go :: Node -> Float -> Tick -> TickingGraph -> [(Path, Float, Tick)]
           go _ _ x _ | x <= -1 = []
-          go current prob ticks tickable | current == end = [([(current, waitDuration tickable)], prob, maxTicks - ticks)]
-          go current prob ticks tickable = let nextTicks = ticks - 1
-                                               squashed = squash tickable
-            in go current prob nextTicks squashed ++ nexts current prob nextTicks tickable
+          go current prob ticks graph | current == end = [([(current, waitDuration graph)], prob, maxTicks - ticks)]
+          go current prob ticks graph = let nextTicks = ticks - 1
+                                            squashed = squash graph
+            in go current prob nextTicks squashed ++ nexts current prob nextTicks graph
 
-          nexts :: Node -> Float -> Tick -> Tickable -> [(Path, Float, Tick)]
-          nexts current prob ticks tickable = map (prepend (current, waitDuration tickable)) . concatMap launch . edgesFrom graph $ current
-            where launch (Edge current next _) = go next (prob * getProb (current, next) tickable) ticks (tick tickable)
+          nexts :: Node -> Float -> Tick -> TickingGraph -> [(Path, Float, Tick)]
+          nexts current prob ticks graph = map (prepend (current, waitDuration graph)) . concatMap launch . edgesFrom graph $ current
+            where launch (Edge current next _) = go next (prob * getProb (current, next) graph) ticks (tick graph)
 
           prepend :: a -> ([a], b, c) -> ([a], b, c)
           prepend x (xs, y, z) = (x:xs, y, z)
@@ -114,7 +113,7 @@ pathSummary (path, prob, ticks) = do
 
 -- | calcRoute is our testing-function to make sure everything works the way
 -- it's supoosed to
-calcRoute :: Node -> Node -> Graph -> Tick -> IO ()
-calcRoute node1 node2 graph maxTicks = mapM_ pathSummary $ filter zeroProb $ run node1 node2 graph maxTicks
+calcRoute :: Node -> Node -> IO ()
+calcRoute node1 node2 = mapM_ pathSummary . filter zeroProb . run node1 node2 exampleGraph $ 4
     where zeroProb (_, 0.0, _) = False
           zeroProb _           = True
