@@ -1,12 +1,8 @@
--- {-# LANGUAGE PatternGuards #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Graphs where
 
 import           Control.Monad   (unless)
 import qualified Data.Map.Strict as M
 import           Data.Maybe      (fromMaybe)
-import           Data.Aeson      (FromJSON, ToJSON)
 
 type Tick = Integer
 
@@ -19,27 +15,30 @@ data Edge = Edge Node Node [Float]
 data Graph = Graph [Edge]
   deriving (Show)
 
-type Path = [Node]
+type Path = [(Node, Tick)]
 
-type Tickable = M.Map (Node, Node) [Float]
+type Tickable = (M.Map (Node, Node) [Float], Tick)
 
 squash :: Tickable -> Tickable
-squash = fmap f
+squash (m, t) = (fmap f m, t + 1)
     where f (a:b:xs) = a + b : xs
           f rest = rest
 
 getProb :: (Node, Node) -> Tickable -> Float
-getProb a b = fromMaybe 0 . safeHead . M.lookup a $ b
+getProb a = fromMaybe 0 . safeHead . M.lookup a . fst
     where safeHead (Just []) = Nothing
           safeHead xs        = fmap head xs
 
 tick :: Tickable -> Tickable
-tick = fmap safeTail
+tick (m, _) = (fmap safeTail m, 0)
     where safeTail [] = []
           safeTail xs = tail xs
 
+waitDuration :: Tickable -> Tick
+waitDuration = snd
+
 toTickable :: Graph -> Tickable
-toTickable (Graph edges) = foldr f M.empty edges
+toTickable (Graph edges) = (foldr f M.empty edges, 0)
     where f (Edge from to ratings) = M.insert (from, to) ratings
 
 probabilityLookup :: Tick -> M.Map Tick Float -> Float
@@ -63,13 +62,13 @@ run :: Node -> Node -> Graph -> Tick -> [(Path, Float, Tick)]
 run start end graph maxTicks = go start 1 maxTicks . toTickable $ graph
     where go :: Node -> Float -> Tick -> Tickable -> [(Path, Float, Tick)]
           go _ _ x _ | x <= -1 = []
-          go current prob ticks _ | current == end = [([current], prob, maxTicks - ticks)]
+          go current prob ticks tickable | current == end = [([(current, waitDuration tickable)], prob, maxTicks - ticks)]
           go current prob ticks tickable = let nextTicks = ticks - 1
                                                squashed = squash tickable
             in go current prob nextTicks squashed ++ nexts current prob nextTicks tickable
 
           nexts :: Node -> Float -> Tick -> Tickable -> [(Path, Float, Tick)]
-          nexts current prob ticks tickable = filter (\(_, prob, _) -> prob /= 0.0) . map (prepend current) . concatMap launch . edgesFrom graph $ current
+          nexts current prob ticks tickable = map (prepend (current, waitDuration tickable)) . concatMap launch . edgesFrom graph $ current
             where launch (Edge current next _) = go next (prob * getProb (current, next) tickable) ticks (tick tickable)
 
           prepend :: a -> ([a], b, c) -> ([a], b, c)
@@ -79,8 +78,17 @@ pathSummary :: (Path, Float, Tick) -> IO ()
 pathSummary (path, prob, ticks) = do
   unless (null path) $ return ()
   putStrLn showString
-  where showString = route ++ " Ticks: " ++ show ticks ++ " Propability: " ++ show prob
-        route      = if null path then "" else foldl1 (\folded el -> folded ++ " -> " ++ el) path
+  where showString = route path ++ " Ticks: " ++ show ticks ++ " Propability: " ++ show prob
+
+        route = foldr f ""
+        f n "" = pathSegment n
+        f n st = pathSegment n ++ " -> " ++ st
+
+        pathSegment (node, 0) = node
+        pathSegment (node, wait) = node ++ " [" ++ show wait ++ "]"
 
 calcRoute :: Node -> Node -> IO ()
-calcRoute node1 node2 = mapM_ pathSummary $ run node1 node2 exampleGraph 4
+calcRoute node1 node2 = mapM_ pathSummary . filter zeroProb . run node1 node2 exampleGraph $ 4
+
+    where zeroProb (_, 0.0, _) = False
+          zeroProb _           = True
