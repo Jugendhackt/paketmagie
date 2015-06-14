@@ -1,5 +1,6 @@
 # __author__ = 'bz'
 import json
+import subprocess
 from geopy.geocoders import Nominatim
 import random
 
@@ -79,7 +80,7 @@ def ParseUsers(Infos):
         user.UserID = parsed[i]['UserID']
         user.pathIDs = parsed[i]['PathIDs']
         Users.append(parsed[i])
-    print "read Users"
+    # print "read Users"
 
 
 def ParseRoute(Infos):
@@ -90,7 +91,7 @@ def ParseRoute(Infos):
         route.exPID = parsed[i]['ExchangeIDs']
         route.UserIDs = parsed[i]['UserIDs']
         Routes.append(route)
-    print "read Route"
+    # print "read Route"
 
 
 def ParsePath(Infos):
@@ -105,7 +106,7 @@ def ParsePath(Infos):
         path.EndTime = parsed[i]['EndTime']
         path.exPoints = parsed[i]['exchangePoints']
         Paths.append(path)
-    print "read Path"
+    # print "read Path"
 
 
 def ParsePackage(Infos):
@@ -119,7 +120,7 @@ def ParsePackage(Infos):
         pack.Travelling = parsed[i]['Travelling']
         pack.RouteID = parsed[i]['RouteID']
         Packages.append(pack)
-    print "read Packages"
+    # print "read Packages"
 
 
 def ParsePoints(Infos):
@@ -132,7 +133,7 @@ def ParsePoints(Infos):
         points.address = parsed[i]['Address']
         points.Name = parsed[i]['Name']
         ExPoints.append(points)
-    print "read Route"
+    # print "read Route"
 
 
 
@@ -213,7 +214,7 @@ def addExPoint(point):
         with open("exchangePoints.json", "r+") as f:
             f.seek(-2, 2)
             f.write(',\n')
-            print json.dump( point_dict, f, indent=2)
+            # print json.dump( point_dict, f, indent=2)
             f.write('\n]')
 
 
@@ -232,7 +233,7 @@ def addPackage(pack):
         with open("Package.json", "r+") as f:
             f.seek(-2, 2)
             f.write(',\n')
-            print json.dump( pack_dict, f, indent=2)
+            # print json.dump( pack_dict, f, indent=2)
             f.write('\n]')
 
 
@@ -251,7 +252,7 @@ def addPath(path):
         with open("exchangePoints.json", "r+") as f:
             f.seek(-2, 2)
             f.write(',\n')
-            print json.dump( point_dict, f, indent=2)
+            # print json.dump( point_dict, f, indent=2)
             f.write('\n]')
 
 
@@ -267,7 +268,7 @@ def addRoute(route):
         with open("Route.json", "r+") as f:
             f.seek(-2, 2)
             f.write(',\n')
-            print json.dump( point_dict, f, indent=2)
+            # print json.dump( point_dict, f, indent=2)
             f.write('\n]')
 
 
@@ -282,14 +283,14 @@ def addUsers(user):
         with open("exchangePoints.json", "r+") as f:
             f.seek(-2, 2)
             f.write(',\n')
-            print json.dump( point_dict, f, indent=2)
+            # print json.dump( point_dict, f, indent=2)
             f.write('\n]')
 
 
 def getStatistics(n):
     stats = []
-    for i in range(n):
-        stats.append(random.uniform(0.2, 1.0) )
+    for i in range(0, n):
+        stats.append(random.uniform(0.0, 1.0) )
     return stats
 
 
@@ -297,13 +298,15 @@ def getJsonData(n):
     data = {
         "edges": []
     }
-    for i in range(1, len(ExPoints.__sizeof__() ) ):
+    for i in range(1, 6):
         point = getExPoint(i)
-        for l in range(1, len(ExPoints.__sizeof__() ) ):
+        for l in range(1, 6):
             point2 = getExPoint(l)
-            jsonfoo = { "to": point.Name, "from": point2.Name,
-                        "propabilities": getStatistics(n) }
-            data['edges'].append(jsonfoo)
+            if point.exID != point2.exID:
+                jsonfoo = { "to": point.Name, "from": point2.Name,
+                            "propabilities": getStatistics(n) }
+                # print jsonfoo
+                data['edges'].append(jsonfoo)
     return data
 
 # print "done, starting geopy"
@@ -321,3 +324,6 @@ def getJsonData(n):
 # addExPoint(point)
 #
 # print "added ExPoint"
+
+
+print getJsonData(int(raw_input() ) )
