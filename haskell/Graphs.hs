@@ -114,6 +114,6 @@ pathSummary (path, prob, ticks) = do
 -- | calcRoute is our testing-function to make sure everything works the way
 -- it's supoosed to
 calcRoute :: Node -> Node -> IO ()
-calcRoute node1 node2 = mapM_ pathSummary . filter zeroProb . run node1 node2 exampleGraph $ 4
+calcRoute node1 node2 = mapM_ pathSummary . filter zeroProb . runAlgorithm node1 node2 exampleGraph $ 4
     where zeroProb (_, 0.0, _) = False
           zeroProb _           = True
