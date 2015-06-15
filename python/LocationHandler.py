@@ -304,7 +304,7 @@ def getJsonData(n):
             point2 = getExPoint(l)
             if point.exID != point2.exID:
                 jsonfoo = { "to": point.Name, "from": point2.Name,
-                            "propabilities": getStatistics(n) }
+                            "probabilities": getStatistics(n) }
                 # print jsonfoo
                 data['edges'].append(jsonfoo)
     return data
