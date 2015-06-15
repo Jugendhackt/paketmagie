@@ -25,7 +25,7 @@ data TickingGraph = TickingGraph [Edge] Tick
 -- added up and the waiting counter is increased.
 squash :: TickingGraph -> TickingGraph
 squash (TickingGraph edges waited) = TickingGraph (map g edges) (waited + 1)
-    where f (a:b:xs) = a + b : xs
+    where f (a:b:xs) = a + b * (1 - a) : xs
           f rest = rest
           g (Edge from to probs) = Edge from to . f $ probs
 
@@ -36,7 +36,7 @@ getProb (from, to) (TickingGraph edges _) = fromMaybe 0 . join . fmap probs . sa
     where safeHead [] = Nothing
           safeHead xs = Just . head $ xs
 
-          qualifies (Edge t f _) | f == from && t == to = True
+          qualifies (Edge f t _) | f == from && t == to = True
           qualifies _ = False
 
           probs (Edge _ _ ps) = safeHead ps
@@ -114,6 +114,6 @@ pathSummary (path, prob, ticks) = do
 -- | calcRoute is our testing-function to make sure everything works the way
 -- it's supoosed to
 calcRoute :: Node -> Node -> IO ()
-calcRoute node1 node2 = mapM_ pathSummary . filter zeroProb . run node1 node2 exampleGraph $ 4
+calcRoute node1 node2 = mapM_ pathSummary . filter zeroProb . runAlgorithm node1 node2 exampleGraph $ 4
     where zeroProb (_, 0.0, _) = False
           zeroProb _           = True
