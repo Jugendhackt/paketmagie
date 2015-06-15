@@ -36,7 +36,7 @@ getProb (from, to) (TickingGraph edges _) = fromMaybe 0 . join . fmap probs . sa
     where safeHead [] = Nothing
           safeHead xs = Just . head $ xs
 
-          qualifies (Edge t f _) | f == from && t == to = True
+          qualifies (Edge f t _) | f == from && t == to = True
           qualifies _ = False
 
           probs (Edge _ _ ps) = safeHead ps
