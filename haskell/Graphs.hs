@@ -25,7 +25,7 @@ data TickingGraph = TickingGraph [Edge] Tick
 -- added up and the waiting counter is increased.
 squash :: TickingGraph -> TickingGraph
 squash (TickingGraph edges waited) = TickingGraph (map g edges) (waited + 1)
-    where f (a:b:xs) = a + b : xs
+    where f (a:b:xs) = a + b * (1 - a) : xs
           f rest = rest
           g (Edge from to probs) = Edge from to . f $ probs
 
