@@ -23,17 +23,17 @@ instance ToJSON Edge where
     , "propabilities" .= props
     ]
 
-instance FromJSON Graph where
-  parseJSON (Object v) = Graph <$> v .: "edges"
+instance FromJSON TickingGraph where
+  parseJSON (Object v) = TickingGraph <$> v .: "edges" <*> v .: "tick"
 
-instance ToJSON Graph where
-  toJSON (Graph edges) = object [ "edges" .= edges ]
+instance ToJSON TickingGraph where
+  toJSON (TickingGraph edges tick) = object [ "edges" .= edges, "tick" .= tick ]
 
 main :: IO ()
 main = do
   jsonIn <- B.getContents
   args   <- getArgs
-  let graph :: Maybe Graph
+  let graph :: Maybe TickingGraph
       graph = decode jsonIn
 
   when (isNothing graph) $ do
