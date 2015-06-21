@@ -12,12 +12,13 @@ refuse any connection without authentication, but a auth-header is
 not yet being sent with).
 
 After that, navigate to `/../bin/`, and type `./neo4j console` to 
-get it running on the console. If you wait a bit until it shows 
+get it running on the console. Wait until it shows 
 
 `INFO  [API] Remote interface ready and available at [http://localhost:7474/]`
 
-now you can call the server by typing [http://localhost:7474/](http://localhost:7474/)
-in your browser. If you did everything correct a neo4j instance should be running there.
+somewhere at the bottom. Now you can call the server by typing 
+[http://localhost:7474/](http://localhost:7474/)in your browser. 
+If you did everything correct a neo4j instance should be running there.
 
 ## add Data to the database
 For the api you need to install py2neo, which is easily to get with 
