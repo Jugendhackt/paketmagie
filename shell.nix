@@ -16,7 +16,7 @@ let
         libraryHaskellDepends = [ base bytestring containers vector ];
         executableHaskellDepends = [ aeson base bytestring vector ];
         description = "Routing Packages magically";
-        license = stdenv.lib.licenses.unfree;
+        license = stdenv.lib.licenses.gpl3;
       };
 
   haskellPackages = if compiler == "default"
