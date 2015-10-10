@@ -81,7 +81,7 @@ weight prob tick = prob ** (1 / tick)
 -- in ticks
 runAlgorithm :: Node -> Node -> TickingGraph -> Tick -> [(Path, Probability, Tick)]
 runAlgorithm start end graph maxTicks = go start 1 maxTicks $ graph
-    where go :: Node -> Probality -> Tick -> TickingGraph -> [(Path, Probability, Tick)]
+    where go :: Node -> Probability -> Tick -> TickingGraph -> [(Path, Probability, Tick)]
           go _ _ x _ | x <= -1 = []
           go current prob ticks graph | current == end = [([(current, waitDuration graph)], prob, maxTicks - ticks)]
           go current prob ticks graph = let nextTicks = ticks - 1
@@ -109,9 +109,3 @@ pathSummary (path, prob, ticks) = do
         pathSegment (node, 0) = node
         pathSegment (node, wait) = node ++ " [" ++ show wait ++ "]"
 
--- | calcRoute is our testing-function to make sure everything works the way
--- it's supoosed to
-calcRoute :: Node -> Node -> IO ()
-calcRoute node1 node2 = mapM_ pathSummary . filter zeroProb . runAlgorithm node1 node2 exampleGraph $ 4
-    where zeroProb (_, 0.0, _) = False
-          zeroProb _           = True
