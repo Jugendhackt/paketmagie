@@ -71,6 +71,18 @@ The actual implementation of the routing algorithm is still work in progress. A 
 
 The duration of the maximum duration has not yet been defined.
 
+== Documentation
+
+You can generate documentation of the Haskell code using haddock:
+
+[source,shell]
+----
+cabal configure
+cabal haddock
+----
+
+If it does not work, consider trying to generate the docs inside a `nix-shell`.
+
 == Building
 
 Using cabal without nix
