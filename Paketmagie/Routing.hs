@@ -1,7 +1,7 @@
 module Paketmagie.Routing where
 
-import Control.Monad   (unless, join)
-import Data.Maybe      (fromMaybe)
+import           Control.Monad (join, unless)
+import           Data.Maybe    (fromMaybe)
 
 -- | A unit of time, probably 15 minutes
 type Tick = Integer
@@ -24,7 +24,7 @@ data TickingGraph = TickingGraph [Edge] Tick
 -- | Squashing means waiting at a waypoint, hence the probabilities will be
 -- added up and the waiting counter is increased.
 squash :: TickingGraph -> TickingGraph
-squash (TickingGraph edges waited) = TickingGraph (map g edges) (waited + 1)
+squash (TickingGraph edges waited) = TickingGraph (map squashEdge edges) (waited + 1)
     where addProbs (a:b:xs) = a + b * (1 - a) : xs
           addProbs rest = rest
           squashEdge (Edge from to probs) = Edge from to . addProbs $ probs
@@ -66,10 +66,10 @@ edgesFrom :: TickingGraph -> Node -> [Edge]
 edgesFrom (TickingGraph edgeList _) node = filter (\(Edge n _ _) -> n == node) edgeList
 
 -- | Probability
-type Probability = Float
+type Probability = Double
 
 -- | Weight of a Path
-type Weight = Float
+type Weight = Double
 
 -- | weight calculates the weight of a Path
 weight :: Probability -> Tick -> Weight
