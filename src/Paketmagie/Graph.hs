@@ -1,7 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Paketmagie.Graph where
 
-import           Control.Monad (join)
 import           Data.Maybe    (fromMaybe)
+import           Data.Aeson
+import           Control.Monad (join, mzero)
 
 -- | A unit of time, probably 15 minutes
 type Tick = Integer
@@ -16,13 +19,13 @@ type Probability = Double
 -- associated with it in a list. Each element of that list corresponds
 -- to a tick.
 data Edge = Edge Node Node [Probability]
-    deriving (Show)
+    deriving (Eq, Show)
 
 -- | A ticking graph is a graph whichs edges a changing weights, in this
 -- case probabilities. For convenience, it also stores the amount of ticks a
 -- packet has waited at a specific waypoint.
 data TickingGraph = TickingGraph [Edge] Tick
-  deriving (Show)
+  deriving (Eq, Show)
 
 -- | Squashing means waiting at a waypoint, hence the probabilities will be
 -- added up and the waiting counter is increased.
@@ -62,4 +65,24 @@ waitDuration (TickingGraph _ t) = t
 -- node
 edgesFrom :: TickingGraph -> Node -> [Edge]
 edgesFrom (TickingGraph edgeList _) node = filter (\(Edge n _ _) -> n == node) edgeList
+
+instance FromJSON Edge where
+  parseJSON (Object v) = Edge <$>
+                         v .: "from" <*>
+                         v .: "to"   <*>
+                         v .: "probabilities"
+  parseJSON _ = mzero
+
+instance ToJSON Edge where
+  toJSON (Edge from to probs) = object
+    [ "from" .= from
+    , "to"   .= to
+    , "probabilities" .= probs
+    ]
+
+instance FromJSON TickingGraph where
+  parseJSON (Object v) = TickingGraph <$> v .: "edges" <*> v .: "tick"
+
+instance ToJSON TickingGraph where
+  toJSON (TickingGraph edges tick) = object [ "edges" .= edges, "tick" .= tick ]
 

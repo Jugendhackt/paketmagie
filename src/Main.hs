@@ -1,35 +1,14 @@
-{-# LANGUAGE OverloadedStrings #-}
 import           Paketmagie.Graph
 import           Paketmagie.Routing
 
 import           Control.Applicative  ((<$>), (<*>))
 import           Control.Monad        (mzero, when)
-import           Data.Aeson
 import           Data.ByteString.Lazy as B (getContents, putStr, readFile)
 import           Data.List            (sortBy)
+import           Data.Aeson
 import           Data.Maybe           (fromJust, isNothing)
 import           Data.Vector          (Vector, (!))
 import           System.Environment   (getArgs)
-
-instance FromJSON Edge where
-  parseJSON (Object v) = Edge <$>
-                         v .: "from" <*>
-                         v .: "to"   <*>
-                         v .: "probabilities"
-  parseJSON _ = mzero
-
-instance ToJSON Edge where
-  toJSON (Edge from to probs) = object
-    [ "from" .= from
-    , "to"   .= to
-    , "probabilities" .= probs
-    ]
-
-instance FromJSON TickingGraph where
-  parseJSON (Object v) = TickingGraph <$> v .: "edges" <*> v .: "tick"
-
-instance ToJSON TickingGraph where
-  toJSON (TickingGraph edges tick) = object [ "edges" .= edges, "tick" .= tick ]
 
 main :: IO ()
 main = do

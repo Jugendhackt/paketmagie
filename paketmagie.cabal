@@ -19,8 +19,10 @@ executable Paketmagie
   default-language:    Haskell2010
 library
   exposed-modules:     Paketmagie.Routing
+                    ,  Paketmagie.Routing.New
                     ,  Paketmagie.Graph
   build-depends:       base
+                    ,  aeson
                     ,  containers
                     ,  bytestring
                     ,  vector

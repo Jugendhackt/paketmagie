@@ -11,13 +11,6 @@ import           Data.Maybe    (fromMaybe)
 -- picked up.
 type Path = [(Node, Tick)]
 
--- | Weight of a Path
-type Weight = Double
-
--- | weight calculates the weight of a Path
-weight :: Probability -> Tick -> Weight
-weight prob tick = prob ** (1 / (fromIntegral tick))
-
 -- | runAlgorithm runs the unwieldy algorithm
 -- It calculates all possible routes between node within a certain duraition,
 -- and returns them, along with their total probability and their duraition
