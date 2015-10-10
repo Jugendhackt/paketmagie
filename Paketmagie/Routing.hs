@@ -73,7 +73,7 @@ type Weight = Double
 
 -- | weight calculates the weight of a Path
 weight :: Probability -> Tick -> Weight
-weight prob tick = prob ** (1 / tick)
+weight prob tick = prob ** (1 / (fromIntegral tick))
 
 -- | runAlgorithm runs the unwieldy algorithm
 -- It calculates all possible routes between node within a certain duraition,
