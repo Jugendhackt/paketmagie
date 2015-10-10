@@ -28,9 +28,10 @@ genEdges g n nodes
     let (g1, g2) = split $ g
         [n1, n2, n3] = take 3 . randomRs (0, length nodes - 1) $ g1
         node = nodes !! n
-        edge1 = Edge node (nodes !! n1) (genProbs g 96)
-        edge2 = Edge node (nodes !! n2) (genProbs g1 96)
-        edge3 = Edge node (nodes !! n3) (genProbs g2 96)
+        ticksNum = 3
+        edge1 = Edge node (nodes !! n1) (genProbs g 3)
+        edge2 = Edge node (nodes !! n2) (genProbs g1 3)
+        edge3 = Edge node (nodes !! n3) (genProbs g2 3)
     in edge1:edge2:edge3:(genEdges g2 (n+1) nodes) 
     
 
@@ -50,12 +51,16 @@ randomGraph = do
     let nodeList = genNodes g n
         edgeList = genEdges g 0 nodeList
 
-    return . TickingGraph edgeList $ 0
+    return . TickingGraph (removeDoubleEdges edgeList) $ 0
 
 
 
--- removeDoubleEdges :: [Edge] -> 
+removeDoubleEdges :: [Edge] -> [Edge]
+removeDoubleEdges = foldr isInThere []
 
-
+isInThere :: Edge -> [Edge] -> [Edge]
+isInThere _ [] = []
+isInThere e@(Edge n1s1 n1s2 _) (c@(Edge n2s1 n2s2 _):l) = 
+    if (n1s1 == n2s1) && (n1s2 == n2s2) then isInThere e l else (e:) . isInThere e $ l
 
 
