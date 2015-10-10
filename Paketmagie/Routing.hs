@@ -1,4 +1,4 @@
-module Graphs where
+module Paketmagie.Routing where
 
 import Control.Monad   (unless, join)
 import Data.Maybe      (fromMaybe)

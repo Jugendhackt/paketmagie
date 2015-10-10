@@ -5,7 +5,7 @@ import           Control.Monad        (mzero, when)
 import           Data.Aeson
 import           Data.ByteString.Lazy as B (readFile, getContents, putStr)
 import           Data.Vector          (Vector, (!))
-import           Graphs
+import           Paketmagie.Routing
 import           System.Environment   (getArgs)
 import Data.Maybe (isNothing, fromJust)
 
