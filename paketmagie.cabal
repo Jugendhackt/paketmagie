@@ -5,7 +5,7 @@ name:                paketmagie
 version:             0.1.0.0
 synopsis:            Routing Packages magically
 -- description:         
--- license:             
+license:             GPL-3
 license-file:        LICENSE
 author:              sternenseemann & brotknust
 maintainer:          git@lukasepple.de
