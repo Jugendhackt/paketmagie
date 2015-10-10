@@ -10,7 +10,7 @@ type Tick = Integer
 type Node = String
 
 -- | An edge represents a path between two nodes and the probabilities
--- associated with it in a list. Each elemnt of that list corresponds
+-- associated with it in a list. Each element of that list corresponds
 -- to a tick.
 data Edge = Edge Node Node [Float]
     deriving (Show)
@@ -25,9 +25,9 @@ data TickingGraph = TickingGraph [Edge] Tick
 -- added up and the waiting counter is increased.
 squash :: TickingGraph -> TickingGraph
 squash (TickingGraph edges waited) = TickingGraph (map g edges) (waited + 1)
-    where f (a:b:xs) = a + b * (1 - a) : xs
-          f rest = rest
-          g (Edge from to probs) = Edge from to . f $ probs
+    where addProbs (a:b:xs) = a + b * (1 - a) : xs
+          addProbs rest = rest
+          squashEdge (Edge from to probs) = Edge from to . addProbs $ probs
 
 -- | getProb retrieves the current probability associated with a connection
 -- between two nodes
@@ -59,18 +59,6 @@ waitDuration (TickingGraph _ t) = t
 -- aproximated max ticks a packet will rest at that point without being
 -- picked up.
 type Path = [(Node, Tick)]
-
--- | exampleGraph is our test data structure for fiddling around in ghci
-exampleGraph :: TickingGraph
-exampleGraph = TickingGraph [
-    Edge "Königsplatz"  "Theater"      [0.75, 0.50, 0.12, 0.30]
-  , Edge "Theater"      "Dom"          [0.32, 0.45, 0.85, 0.63]
-  , Edge "Königsplatz"  "Rathausplatz" [0.10, 0.10, 0.10, 0.30]
-  , Edge "Rathausplatz" "Moritzplatz"  [0.70, 0.01, 0.50, 0.20]
-  , Edge "Rathausplatz" "Dom"          [0.25, 0.10, 0.20, 0.50]
-  , Edge "Dom"          "Rathausplatz" [0.30, 0.13, 0.50, 0.60]
-  , Edge "Moritzplatz"  "Königsplatz"  [0.20, 0.41, 0.10, 0.03]
-    ] 0
 
 -- | edgesFrom returns all the edges in a graph that point away from a specified
 -- node
