@@ -13,14 +13,14 @@ instance FromJSON Edge where
   parseJSON (Object v) = Edge <$>
                          v .: "from" <*>
                          v .: "to"   <*>
-                         v .: "propabilities"
+                         v .: "probabilities"
   parseJSON _ = mzero
 
 instance ToJSON Edge where
-  toJSON (Edge from to props) = object
+  toJSON (Edge from to probs) = object
     [ "from" .= from
     , "to"   .= to
-    , "propabilities" .= props
+    , "probabilities" .= probs
     ]
 
 instance FromJSON TickingGraph where

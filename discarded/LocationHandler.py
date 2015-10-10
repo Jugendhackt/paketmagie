@@ -80,9 +80,9 @@ Defining all the methods parsing
 """
 
 
-def ParseUsers(Infos):
-    parsed = json.loads(Infos)
-    for i in range(len(parsed) ):
+def parse_users(infos):
+    parsed = json.loads(infos)
+    for i in range(len(parsed)):
         user = User()
         user.UserID = parsed[i]['UserID']
         user.pathIDs = parsed[i]['PathIDs']
@@ -90,9 +90,9 @@ def ParseUsers(Infos):
     # print "read Users"
 
 
-def ParseRoute(Infos):
-    parsed = json.loads(Infos)
-    for i in range(len(parsed) ):
+def parse_route(infos):
+    parsed = json.loads(infos)
+    for i in range(len(parsed)):
         route = Route()
         route.RouteID = parsed[i]['RouteID']
         route.exPID = parsed[i]['ExchangeIDs']
@@ -101,11 +101,11 @@ def ParseRoute(Infos):
     # print "read Route"
 
 
-def ParsePath(Infos):
-    parsed = json.loads(Infos)
-    for i in range(len(parsed) ):
+def parse_path(infos):
+    parsed = json.loads(infos)
+    for i in range(len(parsed)):
         path = Path()
-        #for att in parsed
+        # for att in parsed
         path.PathID = parsed[i]['PathID']
         path.StartPoint = parsed[i]['StartPoint']
         path.EndPoint = parsed[i]['EndPoint']
@@ -116,9 +116,9 @@ def ParsePath(Infos):
     # print "read Path"
 
 
-def ParsePackage(Infos):
-    parsed = json.loads(Infos)
-    for i in range(len(parsed) ):
+def parse_package(infos):
+    parsed = json.loads(infos)
+    for i in range(len(parsed)):
         pack = Package()
         pack.PackageID = parsed[i]['PackageID']
         pack.Start = parsed[i]['Start']
@@ -130,9 +130,9 @@ def ParsePackage(Infos):
     # print "read Packages"
 
 
-def ParsePoints(Infos):
-    parsed = json.loads(Infos)
-    for i in range(len(parsed) ):
+def parse_points(infos):
+    parsed = json.loads(infos)
+    for i in range(len(parsed)):
         points = ExPoint()
         points.exID = parsed[i]['ExchangeID']
         points.PackageID = parsed[i]['PackageID']
@@ -148,66 +148,67 @@ opening the files and Parsing the found json objects
 """
 
 with open("Users.json") as f:
-    UserInfos = f.read()
-    ParseUsers(UserInfos)
+    user_infos = f.read()
+    parse_users(user_infos)
 
 with open("exchangePoints.json") as f:
     exPs = f.read()
-    ParsePoints(exPs)
+    parse_points(exPs)
 
 with open("Package.json") as f:
     packages = f.read()
-    ParsePackage(packages)
+    parse_package(packages)
 
 with open("Route.json") as f:
     routes = f.read()
-    ParseRoute(routes)
+    parse_route(routes)
 
 with open("Path.json") as f:
     paths = f.read()
-    ParsePath(paths)
+    parse_path(paths)
 
 
 """
 API for accessing the JSON data
 """
 
-def getUser(id):
+
+def get_user(user_id):
     global Users
     for user in Users:
-        if user.UserID == id:
+        if user.UserID == user_id:
             return user
     return None
 
 
-def getExPoint(id):
+def get_exchange_point(ex_id):
     global ExPoints
     for exP in ExPoints:
-        if exP.exID == id:
+        if exP.exID == ex_id:
             return exP
     return None
 
 
-def getPackage(id):
+def get_package(package_id):
     global Packages
     for pack in Packages:
-        if pack.PackageID == id:
+        if pack.PackageID == package_id:
             return pack
     return None
 
 
-def getRoute(id):
+def get_route(route_id):
     global Routes
     for route in Routes:
-        if route.RouteID == id:
+        if route.RouteID == route_id:
             return route
     return None
 
 
-def getPath(id):
+def get_path(path_id):
     global Paths
     for path in Paths:
-        if path.PathID == id:
+        if path.PathID == path_id:
             return path
     return None
 
@@ -215,7 +216,8 @@ def getPath(id):
 API for adding data to the JSON files
 """
 
-def addExPoint(point):
+
+def add_exchange_point(point):
     global ExPoints
     if type(point) == ExPoint:
         ExPoints.append(point)
@@ -227,14 +229,15 @@ def addExPoint(point):
             "Volume": [0, 0, 0],
             "PackageID": point.PackageID
         }
-        with open("exchangePoints.json", "r+") as f:
-            f.seek(-2, 2)
-            f.write(',\n')
-            # print json.dump( point_dict, f, indent=2)
-            f.write('\n]')
+        with open("exchangePoints.json", "r+") as exPoints_json:
+            exPoints_json.seek(-2, 2)
+            exPoints_json.write(',\n')
+            # print
+            json.dump(point_dict, exPoints_json, indent=2)
+            exPoints_json.write('\n]')
 
 
-def addPackage(pack):
+def add_package(pack):
     global Packages
     if type(pack) == Package:
         Packages.append(pack)
@@ -246,15 +249,16 @@ def addPackage(pack):
             "Travelling": pack.Travelling,
             "RouteID": pack.RouteID
         }
-        with open("Package.json", "r+") as f:
-            f.seek(-2, 2)
-            f.write(',\n')
-            # print json.dump( pack_dict, f, indent=2)
-            f.write('\n]')
+        with open("Package.json", "r+") as packs_json:
+            packs_json.seek(-2, 2)
+            packs_json.write(',\n')
+            # print
+            json.dump(pack_dict, packs_json, indent=2)
+            packs_json.write('\n]')
 
 
-def addPath(path):
-    global Path
+def add_path(path):
+    # global Path
     if type(path) == Path:
         Paths.append(path)
         point_dict = {
@@ -265,14 +269,15 @@ def addPath(path):
             "EndTime": path.EndTime,
             "exchangePoints": path.exPoints
         }
-        with open("exchangePoints.json", "r+") as f:
-            f.seek(-2, 2)
-            f.write(',\n')
-            # print json.dump( point_dict, f, indent=2)
-            f.write('\n]')
+        with open("exchangePoints.json", "r+") as paths_json:
+            paths_json.seek(-2, 2)
+            paths_json.write(',\n')
+            # print
+            json.dump(point_dict, paths_json, indent=2)
+            paths_json.write('\n]')
 
 
-def addRoute(route):
+def add_route(route):
     global Routes
     if type(route) == Route:
         Routes.append(route)
@@ -281,14 +286,15 @@ def addRoute(route):
             "ExchangeIDs": route.exPID,
             "UserIDs": route.UserIDs
         }
-        with open("Route.json", "r+") as f:
-            f.seek(-2, 2)
-            f.write(',\n')
-            # print json.dump( point_dict, f, indent=2)
-            f.write('\n]')
+        with open("Route.json", "r+") as routes_json:
+            routes_json.seek(-2, 2)
+            routes_json.write(',\n')
+            # print
+            json.dump(point_dict, routes_json, indent=2)
+            routes_json.write('\n]')
 
 
-def addUsers(user):
+def add_users(user):
     global Users
     if type(user) == User:
         Users.append(user)
@@ -296,35 +302,36 @@ def addUsers(user):
             "UserID": user.UserID,
             "PathIDs": user.pathIDs
         }
-        with open("exchangePoints.json", "r+") as f:
-            f.seek(-2, 2)
-            f.write(',\n')
-            # print json.dump( point_dict, f, indent=2)
-            f.write('\n]')
+        with open("exchangePoints.json", "r+") as points:
+            points.seek(-2, 2)
+            points.write(',\n')
+            # print
+            json.dump(point_dict, points, indent=2)
+            points.write('\n]')
 
 """
 input: a number n
 returns: all the routes possible with @param n number probabilities for connections to each other
 """
 
-def getStatistics(n):
+
+def get_stats(n):
     stats = []
     for i in range(0, n):
-        stats.append(random.uniform(0.0, 1.0) )
+        stats.append(random.uniform(0.0, 1.0))
     return stats
 
 
-def getJsonData(n):
+def get_json_data(n):
     data = {
         "edges": []
     }
     for i in range(1, 6):
-        point = getExPoint(i)
+        point = get_exchange_point(i)
         for l in range(1, 6):
-            point2 = getExPoint(l)
+            point2 = get_exchange_point(l)
             if point.exID != point2.exID:
-                jsonfoo = { "to": point.Name, "from": point2.Name,
-                            "probabilities": getStatistics(n) }
+                jsonfoo = {"to": point.Name, "from": point2.Name, "probabilities": get_stats(n)}
                 # print jsonfoo
                 data['edges'].append(jsonfoo)
     return data
@@ -346,4 +353,4 @@ def getJsonData(n):
 # print "added ExPoint"
 
 
-print getJsonData(int(raw_input() ) )
+# print get_json_data(int(raw_input()))
