@@ -1,13 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
+import           Paketmagie.Graph
+import           Paketmagie.Routing
+
 import           Control.Applicative  ((<$>), (<*>))
-import           Data.List            (sortBy)
 import           Control.Monad        (mzero, when)
 import           Data.Aeson
-import           Data.ByteString.Lazy as B (readFile, getContents, putStr)
+import           Data.ByteString.Lazy as B (getContents, putStr, readFile)
+import           Data.List            (sortBy)
+import           Data.Maybe           (fromJust, isNothing)
 import           Data.Vector          (Vector, (!))
-import           Paketmagie.Routing
 import           System.Environment   (getArgs)
-import Data.Maybe (isNothing, fromJust)
 
 instance FromJSON Edge where
   parseJSON (Object v) = Edge <$>
