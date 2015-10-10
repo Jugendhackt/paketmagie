@@ -1,0 +1,108 @@
+paketmagie
+==========
+brotknust, Bez and sternenseemann
+:toc:
+:showtitle:
+
+„Magische Pakete, biologisch und ohne Gentechnik geroutet. 🌚”
+
+== Spec
+
+=== Idea
+
+The aim of paketmagie is creating a method to decentrally transport parcels in urban areas.
+
+This is done via people who transport parcels on a voluntary basis between physical parcel exchange points.
+
+=== Outline
+
+The design consists of the following elements:
+
+* Physical Parcel exchange points (which are just fancy lockers).
+* People who transport parcels between exchange points (≙ connections between exchange points).
+* People who want to have a parcel transported between two exchange points.
+
+People are the users.
+Connections and exchange points are the graph.
+
+Connections change over time.
+Exchange points change very rarely since they are physical things.
+→ The graph changes over time.
+
+Finally there is a network service (ideally of decentral nature) which is aware of the graph and the users. It allows users to…
+
+* …change their own set of connections.
+* …route a parcel between two exchange points.
+
+=== Routing
+
+The following section describes how the service (our software) routes parcels. Routing is decoupled from any interfaces etc. as it is carried out as library.
+
+The following code listning shows how we represent the graph in our routing algorithm.
+
+[source,haskell]
+----
+type Tick = Integer
+type Node = String
+type Probability = Double
+data Edge = Edge Node Node [Probability]
+data TickingGraph = TickingGraph [Edge] Tick
+----
+
+.Initial considerations
+Since parcels get transported by humans we "predict" human actions whilst routing. Of course it is not at all possible to predict human actions, so our approach is to predict them "good enough".
+
+.Ticks
+A `Tick` is the elementary time unit our Routing knows. It is used for predicting times "good enough". Currently the a Tick is 15 minutes long.
+
+.Node
+A `Node` is the representation of a exchange point. It is represented by its name currently but that representation should change.
+
+.Probability
+As another consequence of the inability to predict human actions we do not calculate the route using the particular connections the users have entered. Therefore we summarise all connections that happen inside a Tick as a probability. In the end every route is associated with a probability. The most probable route is used if it does not take too long.
+
+.Edge
+A graph Edge is a connection between two parcel exchange points.
+
+.TickingGraph
+The ticking Graph couples the graph with the number of Ticks that have passed while routing in order to keep track of the connections' probabilities.
+
+The actual implementation of the routing algorithm is still work in progress. A sane algorithm may take the graph at the time of routing and return the most probable route that does not exceed the maximum route duration.
+
+The duration of the maximum duration has not yet been defined.
+
+== Documentation
+
+You can generate documentation of the Haskell code using haddock:
+
+[source,shell]
+----
+cabal configure
+cabal haddock
+----
+
+If it does not work, consider trying to generate the docs inside a `nix-shell`.
+
+== Building
+
+Using cabal without nix
+
+[source,shell]
+----
+cabal sandbox init
+cabal configure
+cabal install --only-dependencies
+cabal build
+----
+
+Using cabal with nix
+
+[source,shell]
+----
+nix-shell shell.nix
+cabal build
+----
+
+== How does it work? How do I use it?
+
+Everything is _really_ work in progress. So please read the code since it will give you the best overview.
