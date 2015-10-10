@@ -12,7 +12,7 @@ type Node = String
 -- | An edge represents a path between two nodes and the probabilities
 -- associated with it in a list. Each element of that list corresponds
 -- to a tick.
-data Edge = Edge Node Node [Float]
+data Edge = Edge Node Node [Probability]
     deriving (Show)
 
 -- | A ticking graph is a graph whichs edges a changing weights, in this
@@ -31,7 +31,7 @@ squash (TickingGraph edges waited) = TickingGraph (map g edges) (waited + 1)
 
 -- | getProb retrieves the current probability associated with a connection
 -- between two nodes
-getProb :: (Node, Node) -> TickingGraph -> Float
+getProb :: (Node, Node) -> TickingGraph -> Probability
 getProb (from, to) (TickingGraph edges _) = fromMaybe 0 . join . fmap probs . safeHead . filter qualifies $ edges
     where safeHead [] = Nothing
           safeHead xs = Just . head $ xs
@@ -65,20 +65,30 @@ type Path = [(Node, Tick)]
 edgesFrom :: TickingGraph -> Node -> [Edge]
 edgesFrom (TickingGraph edgeList _) node = filter (\(Edge n _ _) -> n == node) edgeList
 
+-- | Probability
+type Probability = Float
+
+-- | Weight of a Path
+type Weight = Float
+
+-- | weight calculates the weight of a Path
+weight :: Probability -> Tick -> Weight
+weight prob tick = prob ** (1 / tick)
+
 -- | runAlgorithm runs the unwieldy algorithm
 -- It calculates all possible routes between node within a certain duraition,
 -- and returns them, along with their total probability and their duraition
 -- in ticks
-runAlgorithm :: Node -> Node -> TickingGraph -> Tick -> [(Path, Float, Tick)]
+runAlgorithm :: Node -> Node -> TickingGraph -> Tick -> [(Path, Probability, Tick)]
 runAlgorithm start end graph maxTicks = go start 1 maxTicks $ graph
-    where go :: Node -> Float -> Tick -> TickingGraph -> [(Path, Float, Tick)]
+    where go :: Node -> Probality -> Tick -> TickingGraph -> [(Path, Probability, Tick)]
           go _ _ x _ | x <= -1 = []
           go current prob ticks graph | current == end = [([(current, waitDuration graph)], prob, maxTicks - ticks)]
           go current prob ticks graph = let nextTicks = ticks - 1
                                             squashed = squash graph
             in go current prob nextTicks squashed ++ nexts current prob nextTicks graph
 
-          nexts :: Node -> Float -> Tick -> TickingGraph -> [(Path, Float, Tick)]
+          nexts :: Node -> Probability -> Tick -> TickingGraph -> [(Path, Probability, Tick)]
           nexts current prob ticks graph = map (prepend (current, waitDuration graph)) . concatMap launch . edgesFrom graph $ current
             where launch (Edge current next _) = go next (prob * getProb (current, next) graph) ticks (tick graph)
 
@@ -86,7 +96,7 @@ runAlgorithm start end graph maxTicks = go start 1 maxTicks $ graph
           prepend x (xs, y, z) = (x:xs, y, z)
 
 -- | pathSummary is a pretty-printer for the output of run
-pathSummary :: (Path, Float, Tick) -> IO ()
+pathSummary :: (Path, Probability, Tick) -> IO ()
 pathSummary (path, prob, ticks) = do
   unless (null path) $ return ()
   putStrLn showString
