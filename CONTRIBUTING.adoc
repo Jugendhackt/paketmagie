@@ -27,6 +27,8 @@ git add <files>
 git commit
 ----
 
+See also: http://chris.beams.io/posts/git-commit/[Git commit]
+
 === Branching
 
 Create a new branch for every new feature or bigger change you develop!
