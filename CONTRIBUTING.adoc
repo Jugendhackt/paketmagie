@@ -13,7 +13,7 @@ __Always__ use `git pull --rebase origin <branch>`! Always! If you have uncommit
 === Committing
 
 * Think before you commit! Do not commit incomplete changes. Check wether you are commiting on the right branch.
-* Run `cabal build` before you commit! Fix compilation errors.
+* Run `cabal configure && cabal build` before you commit! Add new dependencies to `paketmagie.cabal`. Fix compilation errors.
 * Split your changes into meaningful commits! If you have got unrelated changes in a file, use `git add -p <file>` to split these into separate commits.
 * Write meaningful, grammatically correct commit messages! Use the additional lines to write down all important aspects of the commit.
 
