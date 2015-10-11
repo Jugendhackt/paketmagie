@@ -41,7 +41,7 @@ genEdges = doGen 0
 
 
 -- | Returns a list of Probabilites of length n generated with g
-genProbs :: (RandomGen a) => a -> Int -> [Probabilites]
+genProbs :: (RandomGen a) => a -> Int -> [Probability]
 genProbs _ 0 = []
 genProbs g n = do
     let (g1, g2) = split $ g
