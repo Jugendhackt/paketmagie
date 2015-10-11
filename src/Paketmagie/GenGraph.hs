@@ -1,10 +1,9 @@
 module Paketmagie.GenGraph
   (randomGraph) where
 
-import           Debug.Trace
 import           Paketmagie.Graph
-import           System.Environment (getArgs)
 import           System.Random
+
 
 -- | Generates a random string from a given RandomGen and an Int
 getRandomString :: (RandomGen a) => a -> Int -> String
@@ -32,12 +31,11 @@ genEdges = doGen 0
           let (g1, g2) = split $ g
               [n1, n2, n3] = take 3 . randomRs (0, length nodes - 1) $ g1
               node = nodes !! n
-              ticksNum = 30
+              ticksNum = 1
               edge1 = Edge node (nodes !! n1) (genProbs g ticksNum)
               edge2 = Edge node (nodes !! n2) (genProbs g1 ticksNum)
               edge3 = Edge node (nodes !! n3) (genProbs g2 ticksNum)
           in edge1:edge2:edge3:(doGen (n+1) g2 nodes)
-
 
 
 -- | Returns a list of Probabilites of length n generated with g
@@ -48,13 +46,16 @@ genProbs g n = do
     (:) (fst . randomR (0.5, 1.0) $ g1) (genProbs g2 (n-1))
 
 
+{-                      main exported function                      -}
+
 -- | Returns a random Graph of length n
 randomGraph :: Int -> IO TickingGraph
 randomGraph n = do
     g <- newStdGen
     let nodeList = genNodes g n
         edgeList = genEdges g nodeList
-    return . TickingGraph (removeDuplicateEdges edgeList) $ 0
+    return . TickingGraph (checkTriples edgeList) $ 0
+
 
 
 -- | Removes duplicate or self-referential edges
@@ -66,10 +67,10 @@ removeDuplicateEdges (x:xs) =
 
 
 -- | Triple-matching the edges for duplicates
-matchTriple :: [Edge] -> [Edge]
-matchTriple [] = []
-matchTriple (a:b:c:xs) = let ys = [a, b, c]
-                in removeDuplicateEdges ys ++ matchTriple xs
+checkTriples :: [Edge] -> [Edge]
+checkTriples [] = []
+checkTriples (a:b:c:xs) = let ys = [a, b, c]
+                in removeDuplicateEdges ys ++ checkTriples xs
 
 
 -- | Decides wether an Edge is to drop by checking for duplicates
