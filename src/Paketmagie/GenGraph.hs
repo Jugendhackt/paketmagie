@@ -1,11 +1,12 @@
-module Paketmagie.GenGraph (randomGraph) where
+module Paketmagie.GenGraph
+  (randomGraph) where
 
-import System.Random
-import Paketmagie.Graph
-import System.Environment (getArgs)
-import Debug.Trace
+import           Debug.Trace
+import           Paketmagie.Graph
+import           System.Environment (getArgs)
+import           System.Random
 
-
+-- | Generates a random string from a given RandomGen and an Int
 getRandomString :: (RandomGen a) => a -> Int -> String
 getRandomString _ 0 = []
 getRandomString g n = do
@@ -13,7 +14,7 @@ getRandomString g n = do
     (++) (take 1 . randomRs ('a', 'z') $ g1) (getRandomString g2 (n-1))
 
 
--- | a Random number generator and how many elements the List should contain
+-- | Returns a list of random nodes of the given length
 genNodes :: (RandomGen a) => a -> Int -> [Node]
 genNodes _ 0 = []
 genNodes g n = do
@@ -39,15 +40,15 @@ genEdges = doGen 0
 
 
 
--- | returns a list of doubles of length n generated with g
-genProbs :: (RandomGen a) => a -> Int -> [Double]
+-- | Returns a list of Probabilites of length n generated with g
+genProbs :: (RandomGen a) => a -> Int -> [Probabilites]
 genProbs _ 0 = []
 genProbs g n = do
     let (g1, g2) = split $ g
     (:) (fst . randomR (0.5, 1.0) $ g1) (genProbs g2 (n-1))
 
 
--- | returns a random Graph of length n
+-- | Returns a random Graph of length n
 randomGraph :: Int -> IO TickingGraph
 randomGraph n = do
     g <- newStdGen
@@ -56,7 +57,7 @@ randomGraph n = do
     return . TickingGraph (removeDuplicateEdges edgeList) $ 0
 
 
--- | removes duplicate or self-referential edges
+-- | Removes duplicate or self-referential edges
 removeDuplicateEdges :: [Edge] -> [Edge]
 removeDuplicateEdges [] = []
 removeDuplicateEdges (x:xs) | selfReferential x = removeDuplicateEdges xs
@@ -71,12 +72,12 @@ matchTriple (a:b:c:xs) = let ys = [a, b, c]
                 in removeDuplicateEdges ys ++ matchTriple xs
 
 
--- | returns if an Edge is droppable based on if it's a duplicate
+-- | Decides wether an Edge is to drop by checking for duplicates
 isDroppable :: Edge -> Edge -> Bool
 isDroppable (Edge from1 to1 _) (Edge from2 to2 _) =
     ((from1 == from2) && (to1 == to2) )
 
 
--- | returns if an Edge is self-referential
+-- | Returns wether an Edge is self-referential
 selfReferential :: Edge -> Bool
 selfReferential (Edge from to _) = from == to
