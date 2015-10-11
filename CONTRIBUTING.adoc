@@ -17,7 +17,7 @@ __Always__ use `git pull --rebase origin <branch>`! Always! If you have uncommit
 * Split your changes into meaningful commits! If you have got unrelated changes in a file, use `git add -p <file>` to split these into separate commits.
 * Write meaningful, grammatically correct commit messages! Use the additional lines to write down all important aspects of the commit.
 
-Tip: If you have commited on the wrong branch, but not commited yet you can do this:
+Tip: If you have commited on the wrong branch, but not pushed yet you can do this:
 
 [source,shell]
 ----
