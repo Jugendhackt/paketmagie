@@ -60,10 +60,7 @@ randomGraph n = do
 
 -- | Removes duplicate or self-referential edges
 removeDuplicateEdges :: [Edge] -> [Edge]
-removeDuplicateEdges [] = []
-removeDuplicateEdges (x:xs) | selfReferential x = removeDuplicateEdges xs
-removeDuplicateEdges (x:xs) =
-    x:(removeDuplicateEdges (filter (not . isDroppable x) xs ) )
+removeDuplicateEdges (x:xs) = filter (\y -> not $ isDroppable x y || selfReferential x) xs
 
 
 -- | Triple-matching the edges for duplicates
