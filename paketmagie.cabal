@@ -13,7 +13,6 @@ executable Paketmagie
   build-depends:       base
                     ,  aeson
                     ,  bytestring
-                    ,  vector
   other-extensions:    PatternGuards, OverloadedStrings
   hs-source-dirs:      src
   default-language:    Haskell2010
@@ -24,7 +23,6 @@ library
   build-depends:       base
                     ,  containers
                     ,  bytestring
-                    ,  vector
                     ,  random
   hs-source-dirs:      src
   default-language:    Haskell2010

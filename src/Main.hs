@@ -8,7 +8,6 @@ import           Data.Aeson
 import           Data.ByteString.Lazy as B (getContents, putStr, readFile)
 import           Data.List            (sortBy)
 import           Data.Maybe           (fromJust, isNothing)
-import           Data.Vector          (Vector, (!))
 import           System.Environment   (getArgs)
 
 instance FromJSON Edge where
