@@ -106,3 +106,7 @@ cabal build
 == How does it work? How do I use it?
 
 Everything is _really_ work in progress. So please read the code since it will give you the best overview.
+
+== Get in touch
+
+We are active in `#paketmagie` on freenode, just say 'Hi' there!
