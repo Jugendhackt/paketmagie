@@ -51,7 +51,11 @@ genProbs g n = do
 
 -- | Removes duplicate or self-referential edges
 removeDuplicateEdges :: [Edge] -> [Edge]
-removeDuplicateEdges (x:xs) = filter (\y -> not $ isDroppable x y || selfReferential x) xs
+removeDuplicateEdges [] = []
+removeDuplicateEdges (x:xs) = let noDuplicates = filter (not . isDroppable $ x) xs
+                                in if selfReferential x
+                                     then noDuplicates
+                                     else x : noDuplicates
 
 -- | Triple-matching the edges for duplicates
 checkTriples :: [Edge] -> [Edge]
